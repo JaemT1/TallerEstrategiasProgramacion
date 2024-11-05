@@ -1,23 +1,35 @@
 
 import ARM.ArbolRecubrimientoMinimo;
 import ARM.Conexion;
-import ARM.UnionFind;
-import com.sun.source.tree.NewArrayTree;
+import Mochila.MochilaVoraz;
+import Mochila.Objeto;
 
-import java.sql.SQLOutput;
 import java.util.*;
 
 public class Main {
     public static void main (String[] args){
         int[] arr = new int[]{1, 2, 3, 4, 5, 6};
         System.out.println(suma(arr,0, arr.length - 1));
-        atm(205000);
+        atm(200000);
 
         //agregarObjetos(520);
 
         int[][] objetos = new int[][]{
                 {1,2,3,4,5},{1,1,1,1,1},{10,20,30,40,50},{20,30,66,40,60}
         };
+
+        List<Objeto> objetosMochila = new ArrayList<>();
+
+        objetosMochila.add(new Objeto(1,2,5,30));
+        objetosMochila.add(new Objeto(2,1,10,40));
+        objetosMochila.add(new Objeto(3,3,15,25));
+        objetosMochila.add(new Objeto(4,1,7,50));
+        objetosMochila.add(new Objeto(5,1,20,70));
+
+        MochilaVoraz mochilaVoraz = new MochilaVoraz(objetosMochila,50);
+        mochilaVoraz.maximizarValor();
+        mochilaVoraz.minimizarPeso();
+        mochilaVoraz.valorPorPeso();
 
         int[][] objetos1 = new int[][]{
                 {1, 2, 3, 4, 5},   // ID
@@ -26,28 +38,7 @@ public class Main {
                 {30, 40, 25, 50, 70} // Valor
         };
 
-        int[][] objetos2 = new int[][]{
-                {1, 2, 3, 4, 5},   // ID
-                {1, 2, 1, 3, 2},   // Cantidad
-                {6, 12, 8, 15, 10}, // Peso
-                {20, 35, 40, 25, 50} // Valor
-        };
-
-        //Mochila
-        //imprimirArreglo(maximizandoValor(100,objetos));
-        exportaciones(50, objetos1);
-
-        int[][] ciudades1 = new int[][] {
-                {0, 2, 0, 6, 0},
-                {2, 0, 3, 8, 5},
-                {0, 3, 0, 0, 7},
-                {6, 8, 0, 0, 9},
-                {0, 5, 7, 9, 0}
-        };
-
-
-
-        List<Conexion> conexiones = new ArrayList<>();
+        List<Conexion> conexiones = new ArrayList<>(); 
         conexiones.add(new Conexion(1,2,1));
         conexiones.add(new Conexion(2,3,2));
         conexiones.add(new Conexion(4,5,3));
@@ -60,7 +51,6 @@ public class Main {
         conexiones.add(new Conexion(3,6,6));
         conexiones.add(new Conexion(5,7,7));
         conexiones.add(new Conexion(5,6,8));
-
 
         ARM(conexiones, 7);
     }
@@ -98,14 +88,14 @@ public class Main {
                         cantidad -= denominaciones[i];
                         billetesEntregados.replace(denominaciones[i], billetesEntregados.get(denominaciones[i])+1);
                     }else if(i==3 && billetes.get(denominaciones[i]) < billetesEntregados.get(denominaciones[i])){
-                        System.out.println("Se nos acabó la plata socio");
+                        System.out.println("Se nos acabaron los billetes");
                         hayPlata = false;
                     }else {
                         i++;
                     }
                 }
             }else{
-                throw new Exception("No le podemos rotar la plata sapo solo múltiplos de 10000");
+                throw new Exception("No le podemos dar la plata, solo valores múltiplos de 10000");
             }
             if(hayPlata) {
                 System.out.println("Plata entregada:");
@@ -121,179 +111,9 @@ public class Main {
         } catch (Exception e) {
             System.out.println(e.getMessage());
         }
-
     }
 
-    public static void exportaciones(int pesoMaximo, int[][] objetos){
-        System.out.println("Maximizando Valor");
-        double[] resultado = maximizandoValor(pesoMaximo, objetos);
-        resultado(resultado, objetos);
-        System.out.println("Minimizando Peso");
-        double[] resultado2 = minimizandoPeso(pesoMaximo, objetos);
-        resultado(resultado2, objetos);
-        System.out.println("Valor por unidad de Peso");
-        double[] resultado3 = valorPorUnidadDePeso(pesoMaximo, objetos);
-        resultado(resultado3, objetos);
-    }
-
-    public static double[] maximizandoValor(int pesoMaximo, int[][] objetos){
-        double[] objetosSeleccionados = new double[objetos[0].length + 1];
-        int[] valores = Arrays.copyOf(objetos[3],objetos[0].length);
-        while(pesoMaximo>0) {
-            int mayor = 0;
-            for (int i = 1; i < valores.length; i++) {
-                if((valores[i] > valores[mayor]) && objetosSeleccionados[i] == 0){
-                        mayor = i;
-                }
-            }
-
-            if((objetos[2][mayor] * objetos[1][mayor]) < pesoMaximo){
-                objetosSeleccionados[mayor] = objetos[1][mayor];
-                valores[mayor] = 0;
-            }else{
-                objetosSeleccionados[mayor] = (double) pesoMaximo /objetos[2][mayor];
-            }
-
-            objetosSeleccionados[objetosSeleccionados.length-1] += objetos[3][mayor] * objetosSeleccionados[mayor];
-
-            pesoMaximo -= (int) (objetos[2][mayor] * objetosSeleccionados[mayor]);
-        }
-        return objetosSeleccionados;
-    }
-
-    public static double[] minimizandoPeso(int pesoMaximo, int[][] objetos){
-        double[] objetosSeleccionados = new double[objetos[0].length + 1];
-        int[] pesos = Arrays.copyOf(objetos[2],objetos[0].length);
-
-        while(pesoMaximo>0) {
-            int menor = 0;
-            for (int i = 1; i < pesos.length; i++) {
-                if(objetosSeleccionados[menor] > 0){
-                    menor+=1;
-                }else{
-                    if((pesos[i] < pesos[menor]) && pesos[i] > 0){
-                        menor = i;
-                    }
-                }
-            }
-
-            if((objetos[2][menor] * objetos[1][menor]) < pesoMaximo){
-                objetosSeleccionados[menor] = objetos[1][menor];
-                pesos[menor] = -1;
-            }else{
-                objetosSeleccionados[menor] = (double) pesoMaximo / objetos[2][menor];
-            }
-
-            objetosSeleccionados[objetosSeleccionados.length-1] += objetos[3][menor] * objetosSeleccionados[menor];
-
-            pesoMaximo -= (int) (objetos[2][menor] * objetosSeleccionados[menor]);
-        }
-        return objetosSeleccionados;
-    }
-
-    public static double[] valorPorUnidadDePeso(int pesoMaximo, int[][] objetos){
-        double[] objetosSeleccionados = new double[objetos[0].length + 1];
-
-        double[] valoresPorPeso = hallarValorPorUnidadDePeso(objetos);
-
-        while(pesoMaximo>0) {
-            int mayor = 0;
-            for (int i = 1; i < valoresPorPeso.length; i++) {
-                if((valoresPorPeso[i] > valoresPorPeso[mayor]) && objetosSeleccionados[i] == 0){
-                    mayor = i;
-                }
-            }
-
-            if((objetos[2][mayor] * objetos[1][mayor]) < pesoMaximo){
-                objetosSeleccionados[mayor] = objetos[1][mayor];
-                valoresPorPeso[mayor] = 0;
-            }else{
-                objetosSeleccionados[mayor] = (double) pesoMaximo /objetos[2][mayor];
-            }
-
-            objetosSeleccionados[objetosSeleccionados.length-1] += objetos[3][mayor] * objetosSeleccionados[mayor];
-
-            pesoMaximo -= (int) (objetos[2][mayor] * objetosSeleccionados[mayor]);
-        }
-        return objetosSeleccionados;
-    }
-
-    private static double[] hallarValorPorUnidadDePeso(int[][] objetos) {
-        double[] valorPorPeso = new double[objetos[0].length];
-        for (int i = 0; i < objetos[0].length; i++) {
-            valorPorPeso[i] = (double) objetos[3][i] / objetos[2][i];
-        }
-        return valorPorPeso;
-    }
-
-
-    public static void resultado(double[] resultado, int[][] objetos){
-        System.out.println("Objetos seleccionados: ");
-        for (int i = 0; i <= resultado.length-2; i++) {
-            if (resultado[i] != 0) {
-                System.out.println(objetos[0][i]);
-            }
-        }
-        System.out.println("Valor total: " + resultado[resultado.length-1]);
-    }
-
-    public static void agregarObjetos(int pesoMaximo){
-        Scanner scanner = new Scanner(System.in);
-        System.out.println("Digite la cantidad de objetos a añadir: ");
-        int cantidad = scanner.nextInt();
-        int[][] objetos = new int[4][cantidad];
-        for(int i = 0; i < cantidad; i++){
-            System.out.println("Digite el id del objeto: ");
-            int objeto = scanner.nextInt();
-            System.out.println("Digite la cantidad disponible del objeto: ");
-            int cantObj = scanner.nextInt();
-            System.out.println("Digite el peso del objeto: ");
-            int peso = scanner.nextInt();
-            System.out.println("Digite el valor del objeto: ");
-            int valor = scanner.nextInt();
-            objetos[0][i] = objeto;
-            objetos[1][i] = cantObj;
-            objetos[2][i] = peso;
-            objetos[3][i] = valor;
-        }
-
-        imprimirArreglo(maximizandoValor(pesoMaximo, objetos));
-    }
-
-    public static void imprimirArreglo(double[] arreglo){
-        for(double num : arreglo){
-            System.out.print(num + ", ");
-        }
-    }
-
-        //Arbol de recubrimiento minimo
-    public static void ARM(){
-        //Arbol de recubrimiento minimo
-        Scanner scanner = new Scanner(System.in);
-
-        System.out.print("Ingrese el número de municipios: ");
-        int numeroMunicipios = scanner.nextInt();
-
-        ArbolRecubrimientoMinimo arbol = new ArbolRecubrimientoMinimo(numeroMunicipios);
-
-        System.out.print("Ingrese el número de conexiones posibles: ");
-        int numeroConexiones = scanner.nextInt();
-
-        for (int i = 0; i < numeroConexiones; i++) {
-            System.out.print("Ingrese el municipio 1 de la conexión " + (i + 1) + ": ");
-            int municipio1 = scanner.nextInt();
-            System.out.print("Ingrese el municipio 2 de la conexión " + (i + 1) + ": ");
-            int municipio2 = scanner.nextInt();
-            System.out.print("Ingrese el costo de la conexión " + (i + 1) + " (en pesos colombianos): ");
-            int costo = scanner.nextInt();
-
-            arbol.agregarConexion(municipio1, municipio2, costo);
-        }
-
-        arbol.encontrarMST();
-        scanner.close();
-    }
-
+    //Arbol de recubrimiento minimo
     public static void ARM(List<Conexion> conexiones, int numeroMunicipios){
         ArbolRecubrimientoMinimo arbol = new ArbolRecubrimientoMinimo(numeroMunicipios, conexiones);
         arbol.encontrarMST();

@@ -12,9 +12,17 @@ public class MainDinamico {
         System.out.println(lucasMemorizado(n, memo));
         printMatrix(coeficientesTabulados(10));
 
-        printMatrix(misterio(nk,nk));
+        printMatrix(misterio(nk,5));
         System.out.println("Matriz parcial");
         printMatrix(coeficientesTabuladosParcial(nk));
+
+        int[] valores = {2, 5, 10, 14, 15}; // Valores de los objetos
+        int[] pesos = {1, 3, 4, 5, 7};      // Pesos de los objetos
+        int pesoMaximo = 8;                // Peso máximo de la mochila
+
+        int valorMaximo = knapsack(pesoMaximo, pesos, valores);
+        System.out.println("El valor máximo que se puede obtener es: " + valorMaximo);
+
     }
 
     public static int lucasTabulado(int n, int[] datos){
@@ -95,6 +103,24 @@ public class MainDinamico {
             }
             System.out.println();
         }
+    }
+
+    //Mochila Dinámico - Tabulado
+    public static int knapsack(int W, int[] w, int[] v) {
+        int n = v.length;
+        int[][] dp = new int[n + 1][W + 1];
+
+        // Rellenamos la tabla de programación dinámica
+        for (int i = 1; i <= n; i++) {
+            for (int j = 0; j <= W; j++) {
+                if (w[i - 1] <= j) {
+                    dp[i][j] = Math.max(dp[i - 1][j], dp[i - 1][j - w[i - 1]] + v[i - 1]);
+                } else {
+                    dp[i][j] = dp[i - 1][j];
+                }
+            }
+        }
+        return dp[n][W];
     }
 
     //Punto 4 del parcial del semestre pasado
