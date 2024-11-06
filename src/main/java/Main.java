@@ -1,44 +1,46 @@
 
 import ARM.ArbolRecubrimientoMinimo;
 import ARM.Conexion;
+import ARM.UnionFind;
 import Mochila.MochilaVoraz;
 import Mochila.Objeto;
+import com.sun.source.tree.NewArrayTree;
 
+import java.sql.SQLOutput;
 import java.util.*;
 
 public class Main {
     public static void main (String[] args){
         int[] arr = new int[]{1, 2, 3, 4, 5, 6};
         System.out.println(suma(arr,0, arr.length - 1));
-        atm(200000);
+        atm(205000);
 
-        //agregarObjetos(520);
+        //Mochila
+        List<Objeto> objetos = new ArrayList<>();
 
-        int[][] objetos = new int[][]{
-                {1,2,3,4,5},{1,1,1,1,1},{10,20,30,40,50},{20,30,66,40,60}
-        };
+        // Crear los objetos con los datos proporcionados
+        objetos.add(new Objeto(1, 2, 5, 30));
+        objetos.add(new Objeto(2, 1, 10, 40));
+        objetos.add(new Objeto(3, 3, 15, 25));
+        objetos.add(new Objeto(4, 1, 7, 50));
+        objetos.add(new Objeto(5, 1, 20, 70));
 
-        List<Objeto> objetosMochila = new ArrayList<>();
+        // Crear instancia de MochilaVoraz con peso máximo de 50
+        MochilaVoraz mochila = new MochilaVoraz(objetos, 50);
 
-        objetosMochila.add(new Objeto(1,2,5,30));
-        objetosMochila.add(new Objeto(2,1,10,40));
-        objetosMochila.add(new Objeto(3,3,15,25));
-        objetosMochila.add(new Objeto(4,1,7,50));
-        objetosMochila.add(new Objeto(5,1,20,70));
+        // Llamar a maximizarValor
+        System.out.println("Maximizando valor:");
+        mochila.maximizarValor();
 
-        MochilaVoraz mochilaVoraz = new MochilaVoraz(objetosMochila,50);
-        mochilaVoraz.maximizarValor();
-        mochilaVoraz.minimizarPeso();
-        mochilaVoraz.valorPorPeso();
+        // Llamar a minimizarPeso
+        System.out.println("\nMinimizando peso:");
+        mochila.minimizarPeso();
 
-        int[][] objetos1 = new int[][]{
-                {1, 2, 3, 4, 5},   // ID
-                {2, 1, 3, 1, 1},   // Cantidad
-                {5, 10, 15, 7, 20}, // Peso
-                {30, 40, 25, 50, 70} // Valor
-        };
+        // Llamar a valorPorPeso
+        System.out.println("\nMaximizando valor por peso:");
+        mochila.valorPorPeso();
 
-        List<Conexion> conexiones = new ArrayList<>(); 
+        List<Conexion> conexiones = new ArrayList<>();
         conexiones.add(new Conexion(1,2,1));
         conexiones.add(new Conexion(2,3,2));
         conexiones.add(new Conexion(4,5,3));
@@ -113,7 +115,6 @@ public class Main {
         }
     }
 
-    //Arbol de recubrimiento minimo
     public static void ARM(List<Conexion> conexiones, int numeroMunicipios){
         ArbolRecubrimientoMinimo arbol = new ArbolRecubrimientoMinimo(numeroMunicipios, conexiones);
         arbol.encontrarMST();

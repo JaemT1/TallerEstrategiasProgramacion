@@ -12,9 +12,8 @@ public class MainDinamico {
         System.out.println(lucasMemorizado(n, memo));
         printMatrix(coeficientesTabulados(10));
 
-        printMatrix(misterio(nk,5));
+        printMatrix(recorrerFilasSucesion(nk,5));
         System.out.println("Matriz parcial");
-        printMatrix(coeficientesTabuladosParcial(nk));
 
         int[] valores = {2, 5, 10, 14, 15}; // Valores de los objetos
         int[] pesos = {1, 3, 4, 5, 7};      // Pesos de los objetos
@@ -86,7 +85,7 @@ public class MainDinamico {
 
     }
 
-    public static int[][] misterio(int n, int k){
+    public static int[][] recorrerFilasSucesion(int n, int k){
         int[][] coeficientes = new int[nk + 1][nk + 1];
         for(int i = 0; i<= n; i++){
             for(int j = 0; j <= Math.min(i,k);j++){
@@ -123,24 +122,4 @@ public class MainDinamico {
         return dp[n][W];
     }
 
-    //Punto 4 del parcial del semestre pasado
-    //Relación de Recurrencia: (n,k) = (n-1,k-1) + 4 * (n, k - 1) 0<k<n ; k=n n^k ; k=0 3*n
-    public static int[][] coeficientesTabuladosParcial(int n){
-        int[][] coeficientes = new int[n + 1][n + 1];
-        for (int i = 0; i <= n; i++) {
-            if(i == 0){
-                coeficientes[i][0] = 0;
-            }else{
-                coeficientes[i][0] = 3 * i;
-                coeficientes[i][i] = (int)Math.pow(i,i);
-            }
-
-        }
-        for (int i = 2; i <= n; i++) {
-            for (int j = 1; j < i; j++) {
-                coeficientes[i][j] = coeficientes[i-1][j - 1] + 4 * coeficientes[i][j-1];
-            }
-        }
-        return coeficientes;
-    }
 }
